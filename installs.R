@@ -1,5 +1,5 @@
 
-## installations RColorBrewer
+## Installations RColorBrewer
 if (!("wordcloud" %in% rownames(installed.packages()))) install.packages('wordcloud')
 if (!("rvest" %in% rownames(installed.packages()))) install.packages('rvest')
 if (!("stringr" %in% rownames(installed.packages()))) install.packages('stringr')
