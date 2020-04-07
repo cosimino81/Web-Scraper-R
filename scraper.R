@@ -63,8 +63,18 @@ for (lk in list_of_pages[1:10]) {
     print(news.date)
     
     # get sharing
-    # news.sharing <- html_nodes(article_webpage, '.meta__extras')
-    # print(news.sharing)
+    news.sharing <- html_nodes(article_webpage, '.meta__numbers') #'.sharecount__value--short'
+    print(news.sharing)
+    news.sharing <- html_nodes(news.sharing, xpath ='//*[contains(concat( " ", @class, " " ), concat( " ", "sharecount__value--short", " " ))]')
+    print(news.sharing)
+    print(html_name(news.sharing))
+    
+    news.sharing <- html_nodes(news.sharing, '.meta__numbers')
+    print(news.sharing)
+    
+    news.sharing <- (html_node(news.sharing, '.meta__number.js-sharecount'))
+    print(news.sharing)
+    print(html_text(news.sharing))
     # 
     # news.sharing <- html_nodes(news.sharing, '.meta_numbers')
     # print(news.sharing)
@@ -72,7 +82,11 @@ for (lk in list_of_pages[1:10]) {
     # print(news.sharing)
     
     # get the news body 
-    news.content <- (html_text(html_nodes(article_webpage, '.js-article__body')))
+    news.content <- html_nodes(article_webpage, '.js-article__body')
+    news.content <- html_nodes(news.content, 'p')
+    news.content <- html_text(news.content)
+    news.content <- paste(news.content, collapse = '')
+    print(news.content)
     
     if (identical(news.content, character(0))) {
       news.body <- ("No text")
@@ -107,13 +121,18 @@ title_vect
 body_vect
 
 
-df <- data.frame(url_vect, date_vect, title_vect, body_vect)
-df
+df <- data.frame(Url = url_vect, Date = date_vect, Title = title_vect, Body = body_vect, stringsAsFactors=FALSE)
 
+str(df)
 
-write.csv(df, "dati.csv")
+head(na.omit(df))
 
+df <- df[complete.cases(df), ]
+head(df)
 
+write.csv(df, "covid19_guardian_news.csv")
 
+df$url_vect[2]
+df$body_vect[2]
 
 

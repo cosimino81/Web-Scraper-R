@@ -5,9 +5,10 @@
 getwd()
 install.packages("tm")
 library(tm)
-all<-read.csv("guardian_coronavirus.csv", header=TRUE, sep=";")
+df <-read.csv("covid19_guardian_news.csv", header=TRUE, sep=";")
+df 
 
-docs<-VCorpus(VectorSource(all$body))
+docs<-VCorpus(VectorSource(df$Body))
 #carico il documento
 #VERIFICO COSA C'è SCRITTO NEL DOC 140
 inspect(docs[[140]])
@@ -24,6 +25,8 @@ docs <- tm_map(docs, content_transformer(tolower))
 docs <- tm_map(docs, removeNumbers)
 
 docs <- tm_map(docs, removeWords, stopwords("english"))
+
+docs <- tm_map(docs, removeWords, c("will","can", "also","said", "now"))
 #stopwords("italian")
 #docs <- tm_map(docs, removeWords, c("xxx", "xxx")) 
 
@@ -31,12 +34,14 @@ docs <- tm_map(docs, removePunctuation)
 docs <- tm_map(docs, stripWhitespace)
 
 dtm <- TermDocumentMatrix(docs)
+dtm
 
-<<TermDocumentMatrix (terms: 31719, documents: 2107)>>
-  Non-/sparse entries: 613829/66218104
-Sparsity           : 99%#  1-(613829/66218104+613829)
-Maximal term length: 94
-Weighting          : term frequency (tf)##IMPORTANTE!!!
+
+# <<TermDocumentMatrix (terms: 31719, documents: 2107)>>
+#   Non-/sparse entries: 613829/66218104
+# Sparsity           : 99%#  1-(613829/66218104+613829)
+# Maximal term length: 94
+# Weighting          : term frequency (tf)##IMPORTANTE!!!
 
 
 
@@ -51,15 +56,18 @@ docs <- tm_map(docs, removeWords, c("will","can", "also","said", "now"))
 dtm <- TermDocumentMatrix(docs)
 m <- as.matrix(dtm)
 v <- sort(rowSums(m),decreasing=TRUE)
-d <- data.frame(word = names(v),freq=v)
-head(d, 10)
-barplot(d[1:10,]$freq, las = 2, names.arg = d[1:10,]$word,
+wdf <- data.frame(word = names(v),freq=v)
+rownames(wdf) <- 1:length(rownames(wdf))
+head(wdf, 10)
+
+barplot(wdf[1:10,]$freq, las = 2, names.arg = d[1:10,]$word,
         col ="lightblue", main ="Parole più frequenti",
         ylab = "frequenza delle parole")
+
 library(wordcloud)       
 library(RColorBrewer)
 set.seed(1234)
-wordcloud(words = d$word, freq = d$freq, scale=c(3, .2),min.freq = 3,
+wordcloud(words = wdf$word, freq = d$freq, scale=c(3, .2),min.freq = 3,
           max.words=100, random.order=FALSE, rot.per=0.15, use.r.layout=FALSE, colors=brewer.pal(8,"Dark2"))
 
 
