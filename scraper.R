@@ -6,11 +6,19 @@ library('stringr')
 library('xml2')
 
 #Specifying the url for desired website to be scraped (The New Your Times)
-ny_times_url <- 'https://www.nytimes.com/section/health'
-gardian_url <- 'https://www.theguardian.com/world/coronavirus-outbreak'
+#ny_times_url <- 'https://www.nytimes.com/section/health'
+guardian_url <- 'https://www.theguardian.com/world/coronavirus-outbreak'
+
+first_page <- read_html(guardian_url)
+
+# page_number <- html_nodes(first_page, '.u-cf')
+# print(page_number)
+# page_number <- html_nodes(page_number, '.pagination__list')
+# print(html_node(page_number, '.is-active'))
+# print(html_text(page_number))
 
 #Reading the HTML code from the website
-list_of_pages <- str_c(gardian_url, '?page=', 1:100)
+list_of_pages <- str_c(gardian_url, '?page=', 1:289)
 list_of_pages
 
 # set vector for df columns
@@ -21,7 +29,7 @@ body_vect = c()
 
 #list_of_pages[1:2]
 
-for (lk in list_of_pages[1:10]) {
+for (lk in list_of_pages) {
   
   # open first link link
   main_webpage <- read_html(lk)
@@ -53,7 +61,7 @@ for (lk in list_of_pages[1:10]) {
     pub.date <- html_nodes(article_webpage, '.content__dateline') 
     pub.date <- html_nodes(pub.date, 'time')
     pub.date <- html_attr(pub.date, 'datetime')[1]
-    print(pub.date)
+    #print(pub.date)
     
     if (identical(pub.date, character(0))) {
        news.date <- "No date"
@@ -63,38 +71,31 @@ for (lk in list_of_pages[1:10]) {
     print(news.date)
     
     # get sharing
-    news.sharing <- html_nodes(article_webpage, '.meta__numbers') #'.sharecount__value--short'
-    print(news.sharing)
-    news.sharing <- html_nodes(news.sharing, xpath ='//*[contains(concat( " ", @class, " " ), concat( " ", "sharecount__value--short", " " ))]')
-    print(news.sharing)
-    print(html_name(news.sharing))
-    
-    news.sharing <- html_nodes(news.sharing, '.meta__numbers')
-    print(news.sharing)
-    
-    news.sharing <- (html_node(news.sharing, '.meta__number.js-sharecount'))
-    print(news.sharing)
-    print(html_text(news.sharing))
+    # news.sharing <- html_nodes(article_webpage, '.meta__numbers') #'.sharecount__value--short'
+    # print(news.sharing)
+    # news.sharing <- html_nodes(news.sharing, xpath ='//*[contains(concat( " ", @class, " " ), concat( " ", "sharecount__value--short", " " ))]')
+    # print(news.sharing)
+    # print(html_name(news.sharing))
     # 
-    # news.sharing <- html_nodes(news.sharing, '.meta_numbers')
+    # news.sharing <- html_nodes(news.sharing, '.meta__numbers')
     # print(news.sharing)
-    # news.sharing <- html_nodes(news.sharing, '.meta__number')
-    # print(news.sharing)
+    # 
+    
     
     # get the news body 
     news.content <- html_nodes(article_webpage, '.js-article__body')
     news.content <- html_nodes(news.content, 'p')
     news.content <- html_text(news.content)
     news.content <- paste(news.content, collapse = '')
-    print(news.content)
+    #print(news.content)
     
-    if (identical(news.content, character(0))) {
-      news.body <- ("No text")
+    if (news.content == "") {
+      news.body <- ("NA")
       #print(news.body)
     } else{
       news.body <- news.content 
     }
-    print(news.body)
+    #print(news.body)
     print("-------------------")
     
     # append new data to the vector
@@ -110,29 +111,32 @@ for (lk in list_of_pages[1:10]) {
   
 }
 
+# check the vectors length
 length(url_vect)
 length(date_vect)
 length(title_vect)
 length(body_vect)
 
-url_vect
-date_vect
-title_vect
-body_vect
 
 
-df <- data.frame(Url = url_vect, Date = date_vect, Title = title_vect, Body = body_vect, stringsAsFactors=FALSE)
+# create the df with the news
+df <- data.frame(Url = as.character(url_vect), 
+                 Date = as.Date(date_vect), 
+                 Title = as.character(title_vect), 
+                 Body = as.character(body_vect), stringsAsFactors = FALSE)
 
-str(df)
 
-head(na.omit(df))
 
-df <- df[complete.cases(df), ]
-head(df)
+# remove NA values
+dfclean <- df[-which(df$Body == "NA"), ]
+str(dfclean)
 
-write.csv(df, "covid19_guardian_news.csv")
+# check if there is any NA 
+is.na.data.frame(dfclean)
 
-df$url_vect[2]
-df$body_vect[2]
+# write csv file
+write.csv(dfclean, "partial_covid19_news.csv")
+
+
 
 

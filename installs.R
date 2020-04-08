@@ -11,3 +11,4 @@ if (!("ggplot2" %in% rownames(installed.packages()))) install.packages('ggplot2'
 if (!("tidytext" %in% rownames(installed.packages()))) install.packages('tidytext')
 if (!("glue" %in% rownames(installed.packages()))) install.packages('glue')
 if (!("stringr" %in% rownames(installed.packages()))) install.packages('stringr')
+if (!("textdata" %in% rownames(installed.packages()))) install.packages('textdata')
