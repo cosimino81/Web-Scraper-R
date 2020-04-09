@@ -120,7 +120,7 @@ length(body_vect)
 
 
 # create the df with the news
-df <- data.frame(Url = as.character(url_vect), 
+df_partial <- data.frame(Url = as.character(url_vect), 
                  Date = as.Date(date_vect), 
                  Title = as.character(title_vect), 
                  Body = as.character(body_vect), stringsAsFactors = FALSE)
@@ -128,14 +128,14 @@ df <- data.frame(Url = as.character(url_vect),
 
 
 # remove NA values
-dfclean <- df[-which(df$Body == "NA"), ]
-str(dfclean)
+df_partial <- dfdf_partial[-which(df_partial$Body == "NA"), ]
+str(df_partial)
 
 # check if there is any NA 
-is.na.data.frame(dfclean)
+is.na.data.frame(df_partial)
 
 # write csv file
-write.csv(dfclean, "partial_covid19_news.csv")
+write.csv(df_partial, "partial_covid19_news.csv")
 
 
 

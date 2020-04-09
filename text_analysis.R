@@ -2,16 +2,27 @@
 ############################
 # TEXTUAL ANALYSIS
 #############################
-getwd()
-install.packages("tm")
-library(tm)
-df <-read.csv("covid19_guardian_news.csv", header=TRUE, sep=";")
-df 
 
-docs<-VCorpus(VectorSource(df$Body))
+library(tm)
+df_pt <-read.csv("partial_covid19_news.csv", header=TRUE, sep=",")
+head(df_pt) 
+
+# get worst news
+worst_news <- df.news[1091, 4]
+worst_news
+
+# get best news
+best_news <- df.news[424, 4]
+best_news
+
+
+docs<-VCorpus(VectorSource(worst_news))
+docs
+
+inspect(docs)
 #carico il documento
 #VERIFICO COSA C'è SCRITTO NEL DOC 140
-inspect(docs[[140]])
+#inspect(docs[[140]])
 
 
 toSpace <- content_transformer(function (x , pattern ) gsub(pattern, " ", x))
@@ -26,7 +37,7 @@ docs <- tm_map(docs, removeNumbers)
 
 docs <- tm_map(docs, removeWords, stopwords("english"))
 
-docs <- tm_map(docs, removeWords, c("will","can", "also","said", "now"))
+docs <- tm_map(docs, removeWords, c("will","can", "also","said", "now", "just", "one", "’re", "might", "get"))
 #stopwords("italian")
 #docs <- tm_map(docs, removeWords, c("xxx", "xxx")) 
 
@@ -52,23 +63,34 @@ v <- sort(rowSums(m),decreasing=TRUE)
 d <- data.frame(word = names(v),freq=v)
 head(d, 10)
 
-docs <- tm_map(docs, removeWords, c("will","can", "also","said", "now")) 
+docs <- tm_map(docs, removeWords, c("will","can", "also","said", "now", "just", "one", "’re", "might", "get", "new")) 
 dtm <- TermDocumentMatrix(docs)
 m <- as.matrix(dtm)
 v <- sort(rowSums(m),decreasing=TRUE)
-wdf <- data.frame(word = names(v),freq=v)
-rownames(wdf) <- 1:length(rownames(wdf))
-head(wdf, 10)
+wdf_pt <- data.frame(word = names(v),freq=v)
+rownames(wdf_pt) <- 1:length(rownames(wdf_pt))
+head(wdf_pt, 10)
 
-barplot(wdf[1:10,]$freq, las = 2, names.arg = d[1:10,]$word,
-        col ="lightblue", main ="Parole più frequenti",
+png("plots/wn_frequent_word.png")
+barplot(wdf_pt[1:10,]$freq, las = 2, names.arg = d[1:10,]$word,
+        col ="blue", main ="Worst News Freqnent Words",
         ylab = "frequenza delle parole")
 
+dev.off()
+
+# word cloud
 library(wordcloud)       
 library(RColorBrewer)
+
 set.seed(1234)
-wordcloud(words = wdf$word, freq = d$freq, scale=c(3, .2),min.freq = 3,
-          max.words=100, random.order=FALSE, rot.per=0.15, use.r.layout=FALSE, colors=brewer.pal(8,"Dark2"))
+png("plots/wordcloud.png")
+wordcloud(words = wdf_pt$word, freq = d$freq, scale=c(3, .2),min.freq = 3, 
+          max.words=Inf, random.order=FALSE, rot.per=0.20, use.r.layout=FALSE, colors=brewer.pal(8,"Dark2"))
+
+dev.off()
+
+
+
 
 
 dtm_clean <- removeSparseTerms(dtm, 0.8)
@@ -90,7 +112,7 @@ wordcloud(words = d$word, freq = d$freq, min.freq = 0,
 
 
 
-findFreqTerms(dtm, lowfreq = 4)#parole che si veriifcano almeno 4 volte  
+findf_ptreqTerms(dtm, lowfreq = 4)#parole che si veriifcano almeno 4 volte  
 findAssocs(dtm_clean, terms = "italy", corlimit = 0.3)#associazione tra parole 
 
 inspect(DocumentTermMatrix(docs,

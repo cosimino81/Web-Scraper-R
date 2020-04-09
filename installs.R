@@ -12,3 +12,7 @@ if (!("tidytext" %in% rownames(installed.packages()))) install.packages('tidytex
 if (!("glue" %in% rownames(installed.packages()))) install.packages('glue')
 if (!("stringr" %in% rownames(installed.packages()))) install.packages('stringr')
 if (!("textdata" %in% rownames(installed.packages()))) install.packages('textdata')
+if (!("SnowballC" %in% rownames(installed.packages()))) install.packages('SnowballC')
+
+
+
