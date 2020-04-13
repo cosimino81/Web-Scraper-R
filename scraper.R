@@ -18,7 +18,7 @@ first_page <- read_html(guardian_url)
 # print(html_text(page_number))
 
 #Reading the HTML code from the website
-list_of_pages <- str_c(gardian_url, '?page=', 1:289)
+list_of_pages <- str_c(gardian_url, '?page=', 1:302)
 list_of_pages
 
 # set vector for df columns
@@ -29,7 +29,7 @@ body_vect = c()
 
 #list_of_pages[1:2]
 
-for (lk in list_of_pages) {
+for (lk in list_of_pages[1]) {
   
   # open first link link
   main_webpage <- read_html(lk)
